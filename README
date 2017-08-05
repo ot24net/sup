@@ -1,0 +1,12 @@
+
+go项目发布管理工具
+
+集成了:
+go的编译指令;
+supervisord守护管理常用指令;
+
+使用环境：
+因依赖于supervisor,发布环境当前仅在debian上做了验证
+
+TODO:
+将supervisor的环境变量移至项目变量脚本中
