@@ -144,7 +144,7 @@ installApp() {
 
 	echo '#' "Installing $cfg_name"
     sudo bash -c "echo "[program:$cfg_name]" > /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "user=root" >> /etc/supervisor/conf.d/$cfg_name.conf"
+    sudo bash -c "echo "user=$USER" >> /etc/supervisor/conf.d/$cfg_name.conf"
     sudo bash -c "echo "command=$pwd_dir/$app_name" >> /etc/supervisor/conf.d/$cfg_name.conf"
     # 设定环境变量
     pwd_dir=`pwd`
