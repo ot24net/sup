@@ -28,31 +28,43 @@ callSup(){
 
 startApp(){
     resetCfgName
-    callSup start $cfg_name
+	if [ $# -gt 1 ]; then
+   		callSup start ${*#*start}
+	else
+        callSup start $cfg_name
+    fi
 }
 
 restartApp(){
     resetCfgName
-    callSup restart $cfg_name
+	if [ $# -gt 1 ]; then
+   		callSup restart ${*#*restart}
+	else
+        callSup restart $cfg_name
+    fi
 }
 
 stopApp(){
     resetCfgName
-    callSup stop $cfg_name
+	if [ $# -gt 1 ]; then
+   		callSup stop ${*#*stop}
+	else
+        callSup stop $cfg_name
+    fi
 }
 
 tailApp(){
     resetCfgName
 	if [ $# -gt 1 ]; then
-   		callSup tail $cfg_name ${!#}
+    	callSup tail ${*#*tail}
 	else
-    	callSup tail $cfg_name
+   		callSup tail $cfg_name
 	fi
 }
 tailfApp(){
     resetCfgName
 	if [ $# -gt 1 ]; then
-   		callSup tail -f $cfg_name ${!#}
+   		callSup tail -f ${*#*tailf}
 	else
     	callSup tail -f $cfg_name
 	fi
