@@ -85,7 +85,7 @@ goGet(){
 
 goUpdate(){
     # get special goget for golang.org/x
-    go get -insecure github.com/ot24net/goget
+    go get -insecure -u github.com/ot24net/goget
     # go get package
     goget -insecure -d -v -u
 }
