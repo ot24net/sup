@@ -23,7 +23,7 @@ resetCfgName(){
 # 调用supevisorctl
 callSup(){
     command -v supervisorctl >/dev/null 2>&1 || { echo -e >&2 "Aborting. \nIt require 'supervisorctl' but it's not installed, you need to install supervisor server. \nFor example: sudo apt-get install supervisor."; exit 1; }
-    sudo supervisorctl -c /etc/supervisor/supervisord.conf $*
+    sudo supervisorctl $*
 }
 
 startApp(){
@@ -31,8 +31,8 @@ startApp(){
 	if [ $# -gt 1 ]; then
    		callSup start ${*#*start}
 	else
-        callSup start $cfg_name
-    fi
+        	callSup start $cfg_name
+    	fi
 }
 
 restartApp(){
@@ -40,8 +40,8 @@ restartApp(){
 	if [ $# -gt 1 ]; then
    		callSup restart ${*#*restart}
 	else
-        callSup restart $cfg_name
-    fi
+        	callSup restart $cfg_name
+ 	fi
 }
 
 stopApp(){
@@ -49,14 +49,14 @@ stopApp(){
 	if [ $# -gt 1 ]; then
    		callSup stop ${*#*stop}
 	else
-        callSup stop $cfg_name
-    fi
+	        callSup stop $cfg_name
+	fi
 }
 
 tailApp(){
     resetCfgName
 	if [ $# -gt 1 ]; then
-    	callSup tail ${*#*tail}
+    		callSup tail ${*#*tail}
 	else
    		callSup tail $cfg_name
 	fi
@@ -66,7 +66,7 @@ tailfApp(){
 	if [ $# -gt 1 ]; then
    		callSup tail -f ${*#*tailf}
 	else
-    	callSup tail -f $cfg_name
+    		callSup tail -f $cfg_name
 	fi
 }
 
@@ -230,37 +230,37 @@ redoCmd(){
             cd $a
             case "$1" in
                     "start")
-                            startApp $*
+                            startApp ${*#*all}
                             ;;
                     "stop")
-                            stopApp $*
+                            stopApp ${*#*all}
                             ;;
                     "restart")
-                            restartApp $*
+                            restartApp ${*#*all}
                             ;;
                     "tail")
-                            tailApp $*
+                            tailApp ${*#*all}
                             ;;
                     "tailf")
-                            tailfApp $*
+                            tailfApp ${*#*all}
                             ;;
                     "build")
-                            buildApp $*
+                            buildApp ${*#*all}
                             ;;
                     "get")
-                            getApp $*
+                            getApp ${*#*all}
                             ;;
                     "install")
-                            installApp $*
+                            installApp ${*#*all}
                             ;;
                     "update")
-                            updateApp $*
+                            updateApp ${*#*all}
                             ;;
                     "clean")
-                            cleanApp $*
+                            cleanApp ${*#*all}
                             ;;
                     "publish")
-                            publishApp $*
+                            publishApp ${*#*all}
                             ;;
                    esac
         fi
