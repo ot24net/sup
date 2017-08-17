@@ -8,5 +8,9 @@ supervisord守护管理常用指令;
 使用环境：
 因依赖于supervisor,发布环境当前仅在debian上做了验证
 
+库版版本管理
+使用gopkg.in的版本管理方式
+例如：go get gopkg.in/yaml.v1
+
 TODO:
 将supervisor的环境变量移至项目变量脚本中
