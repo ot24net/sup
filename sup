@@ -1,42 +1,77 @@
 #!/bin/bash
 
+# 检查依赖
+if [ -z $PJ_NAME ]; then
+    echo "\$PJ_NAME NOT FOUND"
+    exit 1
+fi
+if [ -z $PJ_ROOT ]; then
+    echo "\$PJ_ROOT NOT FOUND"
+    exit 1
+fi
+
+# 环境变量配置
 pwd_dir=`pwd`
 if [ ${#1} -gt 0 ]; then
-    pwd_dir=$1
+	pwd_dir=$1
 fi
+
 app_name=`basename $pwd_dir`
 app_path="${pwd_dir#\/*src\/}"
-cfg_name="$PJNAME.${app_path//\//.}"
-pub_root=$PJROOT/publish
-pub_dir=$pub_root/$PJNAME
+
+cfg_name="$PJ_NAME.${app_path//\//.}"
+
+pub_root=$PJ_ROOT/publish
+pub_dir=$pub_root/$PJ_NAME
+
+sup_etc_dir="/etc/supervisor/conf.d"
+if [ !$SUP_ETC_DIR ] ; then
+	sup_etc_dir=$SUP_ETC_DIR
+fi
+if [ "${sup_etc_dir: -1}" = "/" ]; then
+	sup_etc_dir=${sup_etc_dir%?}
+fi
+sup_log_size="1MB"
+if [ !$SUP_LOG_SIZE ] ; then
+        sup_log_size=$SUP_LOG_SIZE
+fi
+sup_log_bak="10"
+if [ !$SUP_LOG_BAK ] ; then
+        sup_log_bak=$SUP_LOG_BAK
+fi
+sup_app_env="PJ_ROOT=\\\"$PJ_ROOT\\\",GIN_MODE=\\\"release\\\",LD_LIBRARY_PATH=\\\"$LD_LIBRARY_PATH\\\""
+if [ !$SUP_APP_ENV ] ; then
+        sup_app_env=$SUP_APP_ENV
+fi
+
 
 resetCfgName(){
-    pwd_dir=`pwd`
-    if [ ${#1} -gt 0 ]; then
-        pwd_dir=$1
-    fi
-    app_name=`basename $pwd_dir`
-    app_path="${pwd_dir#\/*src\/}"
-    cfg_name="$PJNAME.${app_path//\//.}"
+	pwd_dir=`pwd`
+	if [ ${#1} -gt 0 ]; then
+		pwd_dir=$1
+	fi
+	app_name=`basename $pwd_dir`
+	app_path="${pwd_dir#\/*src\/}"
+	cfg_name="$PJ_NAME.${app_path//\//.}"
 }
 
-# 调用supevisorctl
+# call supevisorctl
 callSup(){
-    command -v supervisorctl >/dev/null 2>&1 || { echo -e >&2 "Aborting. \nIt require 'supervisorctl' but it's not installed, you need to install supervisor server. \nFor example: sudo apt-get install supervisor."; exit 1; }
-    sudo supervisorctl $*
+	command -v supervisorctl >/dev/null 2>&1 || { echo -e >&2 "Aborting. \nIt require 'supervisorctl' but it's not installed, you need to install supervisor server. \nFor example: sudo apt-get install supervisor."; exit 1; }
+	sudo supervisorctl $*
 }
 
 startApp(){
-    resetCfgName
+	resetCfgName
 	if [ $# -gt 1 ]; then
-   		callSup start ${*#*start}
+		callSup start ${*#*start}
 	else
-        	callSup start $cfg_name
-    	fi
+		callSup start $cfg_name
+	fi
 }
 
 restartApp(){
-    resetCfgName
+	resetCfgName
 	if [ $# -gt 1 ]; then
    		callSup restart ${*#*restart}
 	else
@@ -45,7 +80,7 @@ restartApp(){
 }
 
 stopApp(){
-    resetCfgName
+	resetCfgName
 	if [ $# -gt 1 ]; then
    		callSup stop ${*#*stop}
 	else
@@ -54,7 +89,7 @@ stopApp(){
 }
 
 tailApp(){
-    resetCfgName
+	resetCfgName
 	if [ $# -gt 1 ]; then
     		callSup tail ${*#*tail}
 	else
@@ -62,7 +97,7 @@ tailApp(){
 	fi
 }
 tailfApp(){
-    resetCfgName
+	resetCfgName
 	if [ $# -gt 1 ]; then
    		callSup tail -f ${*#*tailf}
 	else
@@ -72,102 +107,103 @@ tailfApp(){
 
 # 查询supervisor的状态
 supStatus(){
-    echo "======================================================="
-    echo "Using sup to manage process"
-    echo "======================================================="
-    callSup status|grep $PJNAME[.]
-    echo "======================================================="
+	echo "======================================================="
+	echo "Using sup to manage process"
+	echo "======================================================="
+	callSup status|grep $PJ_NAME[.]
+	echo "======================================================="
 }
 
 goBuild(){
-    # get special goget for golang.org/x
-    go get -insecure github.com/ot24net/goget
-    # go get package
-    goget -insecure -d -v
-    # go  build
-	go build || exit 1
+	# get special goget for golang.org/x
+	go get -insecure github.com/ot24net/goget
+	# go get package
+	goget -insecure -d -v
+	# go  build
+	go build -i || exit 1
 }
 
 goGet(){
-    # get special goget for golang.org/x
-    go get -insecure github.com/ot24net/goget
-    # go get package
-    goget -insecure -d -v
+	# get special goget for golang.org/x
+	go get -insecure github.com/ot24net/goget
+	# go get package
+	goget -insecure -d -v
 }
 
 goUpdate(){
-    # get special goget for golang.org/x
-    go get -insecure -u github.com/ot24net/goget
-    # go get package
-    goget -insecure -d -v -u
+	# get special goget for golang.org/x
+	go get -insecure -u github.com/ot24net/goget
+	# go get package
+	goget -insecure -d -v -u
 }
 
 # 编译程序
 # 需进入当前目录才能编译
 buildApp() {
-    resetCfgName
+	resetCfgName
 	echo '#' "Building $cfg_name"
-    goBuild
+	goBuild
 }
 
 # 下载最新依赖编译程序
 # 需进入当前目录才能编译
 getApp(){
-    resetCfgName
+	resetCfgName
 	echo '#' "Doing go get $cfg_name"
-    goGet
+	goGet
 }
 
 # 下载最新依赖编译程序
 # 需进入当前目录才能编译
 updateApp(){
-    resetCfgName
+	resetCfgName
 	echo '#' "Updateing $cfg_name"
-    goUpdate
+	goUpdate
 }
 
 # 编译程序
 # 需进入当前目录才能编译
 installApp() {
-    resetCfgName
-
-    # build supervisor conf
-    if [ -f /etc/supervisor/conf.d/$cfg_name.conf ]; then
-       echo '#' "'$cfg_name' already exist"
-       return 1
-    fi
-
-    if [ ! -f $pwd_dir/$app_name ]; then
-       echo '#' "Not found '$cfg_name' binary command, need build at first"
-       return 1
-    fi
-
+	resetCfgName
+	
+	# build supervisor conf
+	sudo mkdir $sup_etc_dir
+	if [ -f $sup_etc_dir/$cfg_name.conf ]; then
+		echo '#' "'$cfg_name' already exist"
+		return 1
+	fi
+	
+	if [ ! -f $pwd_dir/$app_name ]; then
+		echo '#' "Not found '$cfg_name' binary command, need build at first"
+		return 1
+	fi
+	
 	echo '#' "Installing $cfg_name"
-    sudo bash -c "echo "[program:$cfg_name]" > /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "user=$USER" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "command=$pwd_dir/$app_name" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    # 设定环境变量
-    pwd_dir=`pwd`
-    # 从环境变量中读取配置
-    sudo bash -c "echo "environment=LD_LIBRARY_PATH=\\\"$LD_LIBRARY_PATH\\\",PJROOT=\\\"$PJROOT\\\",GIN_MODE=\\\"release\\\"" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "autostart=true" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "autorestart=true" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "directory=$pwd_dir" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stdout_logfile=$PJROOT/log/$cfg_name.logfile.stdout" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stdout_logfile_maxbytes=1MB" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stdout_logfile_backups=10" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stdout_capture=$PJROOT/log/$cfg_name.captuer.stdout" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stdout_capture_maxbytes=1MB" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stdout_capture_backups=10" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stderr_logfile=$PJROOT/log/$cfg_name.logfile.stderr" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stderr_logfile_maxbytes=1MB" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stderr_logfile_backups=10" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stderr_capture=$PJROOT/log/$cfg_name.capture.stderr" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stderr_capture_maxbytes=1MB" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "stderr_capture_backups=10" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    sudo bash -c "echo "" >> /etc/supervisor/conf.d/$cfg_name.conf"
-    callSup reread
-    callSup add $cfg_name
+	sudo bash -c "echo "[program:$cfg_name]" > $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "user=$USER" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "command=$pwd_dir/$app_name" >> $sup_etc_dir/$cfg_name.conf"
+	# 设定环境变量
+	pwd_dir=`pwd`
+	# 从环境变量中读取配置
+	sudo bash -c "echo "environment=$sup_app_env" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "autostart=true" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "autorestart=true" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "directory=$pwd_dir" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stdout_logfile=$PJ_ROOT/log/$cfg_name.logfile.stdout" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stdout_logfile_maxbytes=$sup_log_size" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stdout_logfile_backups=$sup_log_bak" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stdout_capture=$PJ_ROOT/log/$cfg_name.captuer.stdout" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stdout_capture_maxbytes=$sup_log_size" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stdout_capture_backups=$sup_log_bak" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stderr_logfile=$PJ_ROOT/log/$cfg_name.logfile.stderr" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stderr_logfile_maxbytes=$sup_log_size" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stderr_logfile_backups=$sup_log_bak" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stderr_capture=$PJ_ROOT/log/$cfg_name.capture.stderr" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stderr_capture_maxbytes=$sup_log_size" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "stderr_capture_backups=$sup_log_bak" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "" >> $sup_etc_dir/$cfg_name.conf"
+	callSup reread
+	callSup add $cfg_name
 }
 
 # 清理程序
@@ -176,10 +212,10 @@ cleanApp(){
     resetCfgName
 
 	echo '#' "Cleaning $cfg_name"
-    if [ -f /etc/supervisor/conf.d/$cfg_name.conf ]; then
+    if [ -f $sup_etc_dir/$cfg_name.conf ]; then
         callSup stop $cfg_name||exit 1
         callSup remove $cfg_name||exit 1
-        sudo rm /etc/supervisor/conf.d/$cfg_name.conf||exit 1
+        sudo rm $sup_etc_dir/$cfg_name.conf||exit 1
     fi
 }
 
@@ -191,11 +227,11 @@ publishApp(){
     mkdir -p $pub_dir/bin
     mkdir -p $pub_dir/res
     mkdir -p $pub_dir/etc
-    cp -rf $PJROOT/env.bash $pub_dir/||exit 1
+    cp -rf $PJ_ROOT/env.bash $pub_dir/||exit 1
     sed -i "s/sup_mode=\"src\"/sup_mode=\"pub\"/g" $pub_dir/env.bash||exit 1
     cp -rf $GOLIBS/src/github.com/ot24net/sup/sup $pub_dir/bin/||exit 1
-    cp -rf $PJROOT/res $pub_dir/
-    cp -rf $PJROOT/etc $pub_dir/
+    cp -rf $PJ_ROOT/res $pub_dir/
+    cp -rf $PJ_ROOT/etc $pub_dir/
 
     rm -rf $pub_dir/src/$app_path||exit 1
     mkdir -p $pub_dir/src/$app_path||exit 1
@@ -278,8 +314,8 @@ case "$1" in
     ;;
     "build"|"get"|"update"|"publish")
            if [ "$sup_mode" == "pub" ]; then
-               echo "Can not use in published mode"
-               exit 0
+           	echo "Can not use in published mode"
+           	exit 0
            fi
            redoCmd $*
            exit 0
