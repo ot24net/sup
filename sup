@@ -24,6 +24,7 @@ cfg_name="$PJ_NAME.${app_path//\//.}"
 pub_root=$PJ_ROOT/publish
 pub_dir=$pub_root/$PJ_NAME
 
+sup_mode="src"
 sup_etc_dir="/etc/supervisor/conf.d"
 if [ !$SUP_ETC_DIR ] ; then
 	sup_etc_dir=$SUP_ETC_DIR
@@ -209,152 +210,152 @@ installApp() {
 # 清理程序
 # 需进入当前目录才能清理
 cleanApp(){
-    resetCfgName
+        resetCfgName
 
 	echo '#' "Cleaning $cfg_name"
-    if [ -f $sup_etc_dir/$cfg_name.conf ]; then
-        callSup stop $cfg_name||exit 1
-        callSup remove $cfg_name||exit 1
-        sudo rm $sup_etc_dir/$cfg_name.conf||exit 1
-    fi
+        if [ -f $sup_etc_dir/$cfg_name.conf ]; then
+                callSup stop $cfg_name||exit 1
+                callSup remove $cfg_name||exit 1
+                sudo rm $sup_etc_dir/$cfg_name.conf||exit 1
+        fi
 }
 
 # 打包程序
 publishApp(){
-    resetCfgName
-    echo '#' "Publishing $cfg_name to $pub_dir"
-
-    mkdir -p $pub_dir/bin
-    mkdir -p $pub_dir/res
-    mkdir -p $pub_dir/etc
-    cp -rf $PJ_ROOT/env.bash $pub_dir/||exit 1
-    sed -i "s/sup_mode=\"src\"/sup_mode=\"pub\"/g" $pub_dir/env.bash||exit 1
-    cp -rf $GOLIBS/src/github.com/ot24net/sup/sup $pub_dir/bin/||exit 1
-    cp -rf $PJ_ROOT/res $pub_dir/
-    cp -rf $PJ_ROOT/etc $pub_dir/
-
-    rm -rf $pub_dir/src/$app_path||exit 1
-    mkdir -p $pub_dir/src/$app_path||exit 1
-
-    # build
+	resetCfgName
+	echo '#' "Publishing $cfg_name to $pub_dir"
+	
+	mkdir -p $pub_dir/bin
+	mkdir -p $pub_dir/res
+	mkdir -p $pub_dir/etc
+	cp -rf $PJ_ROOT/env.bash $pub_dir/||exit 1
+	cp -rf $(dirname $0)/sup $pub_dir/bin/||exit 1
+	sed -i "s/sup_mode=\"src\"/sup_mode=\"pub\"/g" $pub_dir/bin/sup||exit 1
+	cp -rf $PJ_ROOT/res $pub_dir/
+	cp -rf $PJ_ROOT/etc $pub_dir/
+	
+	rm -rf $pub_dir/src/$app_path||exit 1
+	mkdir -p $pub_dir/src/$app_path||exit 1
+	
+	# build
 	goBuild|| exit 1
-    # collecting for main app
-    mv $app_name $pub_dir/src/$app_path||exit 1
-    # collecting for web static file
-    if [ -d "$pwd_dir/public" ]; then
-        cp -rf $pwd_dir/public $pub_dir/src/$app_path||exit 1
-    fi
+	# collecting for main app
+	mv $app_name $pub_dir/src/$app_path||exit 1
+	# collecting for web static file
+	if [ -d "$pwd_dir/public" ]; then
+		cp -rf $pwd_dir/public $pub_dir/src/$app_path||exit 1
+	fi
 }
 
 redoCmd(){
-    # 备份当前目录
-    currdir=`pwd`
-    buildp=$currdir
-
-    # 校验是否是全部编译
-    if [ "$2" = "all" ] ; then
-        buildp=$BUILDPATH
-        # Spec for publish
-        if [ "$1" = "publish" ]; then
-           rm -rf $pub_dir||exit 1
-        fi
-    fi
-
-    for a in $buildp
-    do
-        if [ -d $a ]; then
-            cd $a
-            case "$1" in
-                    "start")
-                            startApp ${*#*all}
-                            ;;
-                    "stop")
-                            stopApp ${*#*all}
-                            ;;
-                    "restart")
-                            restartApp ${*#*all}
-                            ;;
-                    "tail")
-                            tailApp ${*#*all}
-                            ;;
-                    "tailf")
-                            tailfApp ${*#*all}
-                            ;;
-                    "build")
-                            buildApp ${*#*all}
-                            ;;
-                    "get")
-                            getApp ${*#*all}
-                            ;;
-                    "install")
-                            installApp ${*#*all}
-                            ;;
-                    "update")
-                            updateApp ${*#*all}
-                            ;;
-                    "clean")
-                            cleanApp ${*#*all}
-                            ;;
-                    "publish")
-                            publishApp ${*#*all}
-                            ;;
-                   esac
-        fi
-    done
-
-    cd $currdir
+	# 备份当前目录
+	currdir=`pwd`
+	buildp=$currdir
+	
+	# 校验是否是全部编译
+	if [ "$2" = "all" ] ; then
+		buildp=$BUILDPATH
+		# Spec for publish
+		if [ "$1" = "publish" ]; then
+			rm -rf $pub_dir||exit 1
+		fi
+	fi
+	
+	for a in $buildp
+	do
+		if [ -d $a ]; then
+	       		cd $a
+	       		case "$1" in
+	                	"start")
+	                	        startApp ${*#*all}
+	                	        ;;
+	                	"stop")
+	                	        stopApp ${*#*all}
+	                	        ;;
+	                	"restart")
+	                	        restartApp ${*#*all}
+	                	        ;;
+	                	"tail")
+	                	        tailApp ${*#*all}
+	                	        ;;
+	                	"tailf")
+	                	        tailfApp ${*#*all}
+	                	        ;;
+	                	"build")
+	                	        buildApp ${*#*all}
+	                	        ;;
+	                	"get")
+	                	        getApp ${*#*all}
+	                	        ;;
+	                	"install")
+	                	        installApp ${*#*all}
+	                	        ;;
+	                	"update")
+	                	        updateApp ${*#*all}
+	                	        ;;
+	                	"clean")
+	                	        cleanApp ${*#*all}
+	                	        ;;
+	                	"publish")
+	                	        publishApp ${*#*all}
+	                	        ;;
+	        	esac
+		fi
+	done
+	
+	cd $currdir
 }
 
 
 # shell参数入口
 case "$1" in 
-   "start"|"stop"|"restart"|"tail"|"tailf"|"install"|"clean")
-           redoCmd $*
-           exit 0
-    ;;
-    "build"|"get"|"update"|"publish")
-           if [ "$sup_mode" == "pub" ]; then
-           	echo "Can not use in published mode"
-           	exit 0
-           fi
-           redoCmd $*
-           exit 0
-    ;;
+	"start"|"stop"|"restart"|"tail"|"tailf"|"install"|"clean")
+		redoCmd $*
+		exit 0
+	;;
+	"build"|"get"|"update"|"publish")
+		if [ "$sup_mode" == "pub" ]; then
+			echo "Can not use in published mode"
+			exit 0
+		fi
+		redoCmd $*
+		exit 0
+	;;
 
-    ""|"help")
-           echo "此脚本集成go与supervisord来管理当前项目发布的程序，以下常用管理指令"
-           echo "========================================================================================"
-           echo "sup build -- 下载当前目录下的依赖并编译程序"
-           echo "sup build all -- 依次下载env.bash的\$BUILDPATH路径下的依赖并编译程序"
-           echo "sup get -- 下载当前目录下的依赖"
-           echo "sup get all -- 依次下载env.bash的\$BUILDPATH路径下的依赖"
-           echo "sup install -- 安装当前目录程序的supervisor配置文件"
-           echo "sup install all -- 安装env.bash的\$BUILDPATH路径下程序的supervisor配置文件"
-           echo "sup update -- 使用最新的库编译应用(go get -u +go build)"
-           echo "sup update all -- 使用最新的库编译env.bash的\$BUILDPATH路径下的程序"
-           echo "sup clean -- 清理当前目录的发布环境"
-           echo "sup clean all -- 依次清理env.bash的\$BUILDPATH路径下的发布环境"
-           echo "sup publish -- 发布为非源码部署"
-           echo "sup publish all -- 依次发布env.bash的\$BUILDPATH路径下的部署"
-           echo "sup start -- 启动当前目录的程序(supervisorctrl start \$cfg_name)"
-           echo "sup start all -- 依次启动env.bash的\$BUILDPATH路径下的程序"
-           echo "sup restart -- 重启当前目录的程序(supervisorctrl restart \$cfg_name)"
-           echo "sup restart all -- 依次重启env.bash的\$BUILDPATH路径下的程序"
-           echo "sup stop -- 停止当前目录的程序(supervisorctrl stop \$cfg_name)"
-           echo "sup stop all -- 依次停止env.bash的\$BUILDPATH路径下的程序"
-           echo "sup tail [\$cfg_name stdout] # 查看当前目录[应用]状态0的控制台输出，等价于 supervisorctrl tail \$cfg_name stdout"
-           echo "sup tailf [\$cfg_name stdout] # 查看当前目录[应用]状态0的控制台输出，等价于 supervisorctrl tail -f \$cfg_name stdout"
-           echo ""
-           echo "supervisord管理命令请参考supervisorctl help"
-           exit 0
-    ;;
-    "status")
-           supStatus
-           exit 0
-    ;;
-    *)
-           callSup $*
-           exit 0
-    ;;
+	""|"help")
+        	echo "此脚本集成go与supervisord来管理当前项目发布的程序，以下常用管理指令"
+        	echo "========================================================================================"
+        	echo "sup build -- 下载当前目录下的依赖并编译程序"
+        	echo "sup build all -- 依次下载env.bash的\$BUILDPATH路径下的依赖并编译程序"
+        	echo "sup get -- 下载当前目录下的依赖"
+        	echo "sup get all -- 依次下载env.bash的\$BUILDPATH路径下的依赖"
+        	echo "sup install -- 安装当前目录程序的supervisor配置文件"
+        	echo "sup install all -- 安装env.bash的\$BUILDPATH路径下程序的supervisor配置文件"
+        	echo "sup update -- 使用最新的库编译应用(go get -u +go build)"
+        	echo "sup update all -- 使用最新的库编译env.bash的\$BUILDPATH路径下的程序"
+        	echo "sup clean -- 清理当前目录的发布环境"
+        	echo "sup clean all -- 依次清理env.bash的\$BUILDPATH路径下的发布环境"
+        	echo "sup publish -- 发布为非源码部署"
+        	echo "sup publish all -- 依次发布env.bash的\$BUILDPATH路径下的部署"
+        	echo "sup start -- 启动当前目录的程序(supervisorctrl start \$cfg_name)"
+        	echo "sup start all -- 依次启动env.bash的\$BUILDPATH路径下的程序"
+        	echo "sup restart -- 重启当前目录的程序(supervisorctrl restart \$cfg_name)"
+        	echo "sup restart all -- 依次重启env.bash的\$BUILDPATH路径下的程序"
+        	echo "sup stop -- 停止当前目录的程序(supervisorctrl stop \$cfg_name)"
+        	echo "sup stop all -- 依次停止env.bash的\$BUILDPATH路径下的程序"
+        	echo "sup tail [\$cfg_name stdout] # 查看当前目录[应用]状态0的控制台输出，等价于 supervisorctrl tail \$cfg_name stdout"
+        	echo "sup tailf [\$cfg_name stdout] # 查看当前目录[应用]状态0的控制台输出，等价于 supervisorctrl tail -f \$cfg_name stdout"
+        	echo ""
+        	echo "supervisord管理命令请参考supervisorctl help"
+        	exit 0
+	;;
+	"status")
+		supStatus
+		exit 0
+	;;
+	*)
+		callSup $*
+		exit 0
+	;;
 esac
 
