@@ -45,7 +45,6 @@ if [ !$SUP_APP_ENV ] ; then
         sup_app_env=$SUP_APP_ENV
 fi
 
-
 resetCfgName(){
 	pwd_dir=`pwd`
 	if [ ${#1} -gt 0 ]; then
@@ -254,7 +253,7 @@ redoCmd(){
 	
 	# 校验是否是全部编译
 	if [ "$2" = "all" ] ; then
-		buildp=$BUILDPATH
+		buildp=$SUP_BUILD_PATH
 		# Spec for publish
 		if [ "$1" = "publish" ]; then
 			rm -rf $pub_dir||exit 1
@@ -326,23 +325,23 @@ case "$1" in
         	echo "此脚本集成go与supervisord来管理当前项目发布的程序，以下常用管理指令"
         	echo "========================================================================================"
         	echo "sup build -- 下载当前目录下的依赖并编译程序"
-        	echo "sup build all -- 依次下载env.bash的\$BUILDPATH路径下的依赖并编译程序"
+        	echo "sup build all -- 依次下载env.bash的\$SUP_BUILD_PATH路径下的依赖并编译程序"
         	echo "sup get -- 下载当前目录下的依赖"
-        	echo "sup get all -- 依次下载env.bash的\$BUILDPATH路径下的依赖"
+        	echo "sup get all -- 依次下载env.bash的\$SUP_BUILD_PATH路径下的依赖"
         	echo "sup install -- 安装当前目录程序的supervisor配置文件"
-        	echo "sup install all -- 安装env.bash的\$BUILDPATH路径下程序的supervisor配置文件"
+        	echo "sup install all -- 安装env.bash的\$SUP_BUILD_PATH路径下程序的supervisor配置文件"
         	echo "sup update -- 使用最新的库编译应用(go get -u +go build)"
-        	echo "sup update all -- 使用最新的库编译env.bash的\$BUILDPATH路径下的程序"
+        	echo "sup update all -- 使用最新的库编译env.bash的\$SUP_BUILD_PATH路径下的程序"
         	echo "sup clean -- 清理当前目录的发布环境"
-        	echo "sup clean all -- 依次清理env.bash的\$BUILDPATH路径下的发布环境"
+        	echo "sup clean all -- 依次清理env.bash的\$SUP_BUILD_PATH路径下的发布环境"
         	echo "sup publish -- 发布为非源码部署"
-        	echo "sup publish all -- 依次发布env.bash的\$BUILDPATH路径下的部署"
+        	echo "sup publish all -- 依次发布env.bash的\$SUP_BUILD_PATH路径下的部署"
         	echo "sup start -- 启动当前目录的程序(supervisorctrl start \$cfg_name)"
-        	echo "sup start all -- 依次启动env.bash的\$BUILDPATH路径下的程序"
+        	echo "sup start all -- 依次启动env.bash的\$SUP_BUILD_PATH路径下的程序"
         	echo "sup restart -- 重启当前目录的程序(supervisorctrl restart \$cfg_name)"
-        	echo "sup restart all -- 依次重启env.bash的\$BUILDPATH路径下的程序"
+        	echo "sup restart all -- 依次重启env.bash的\$SUP_BUILD_PATH路径下的程序"
         	echo "sup stop -- 停止当前目录的程序(supervisorctrl stop \$cfg_name)"
-        	echo "sup stop all -- 依次停止env.bash的\$BUILDPATH路径下的程序"
+        	echo "sup stop all -- 依次停止env.bash的\$SUP_BUILD_PATH路径下的程序"
         	echo "sup tail [\$cfg_name stdout] # 查看当前目录[应用]状态0的控制台输出，等价于 supervisorctrl tail \$cfg_name stdout"
         	echo "sup tailf [\$cfg_name stdout] # 查看当前目录[应用]状态0的控制台输出，等价于 supervisorctrl tail -f \$cfg_name stdout"
         	echo ""
