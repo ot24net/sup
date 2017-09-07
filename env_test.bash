@@ -4,7 +4,7 @@
 
 # 配置项目环境变量
 export PJ_NAME="goapp" # 配置项目名称
-export PJ_ROOT="." # 配置项目工作路径
+export PJ_ROOT=`pwd` # 配置项目工作路径
 
 # 以下是部署时的supervisor默认配置数据，若未配置时，会使用以下默认数据
 # 开发IDE可不配置以下环境变量
