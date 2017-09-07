@@ -117,7 +117,7 @@ supStatus(){
 
 goBuild(){
 	# get special goget for golang.org/x
-	go get -insecure github.com/ot24net/goget
+	go get -insecure gopkg.in/ot24net/goget.v1
 	# go get package
 	goget -insecure -d -v
 	# go  build
@@ -126,14 +126,14 @@ goBuild(){
 
 goGet(){
 	# get special goget for golang.org/x
-	go get -insecure github.com/ot24net/goget
+	go get -insecure gopkg.in/ot24net/goget.v1
 	# go get package
 	goget -insecure -d -v
 }
 
 goUpdate(){
 	# get special goget for golang.org/x
-	go get -insecure -u github.com/ot24net/goget
+	go get -insecure -u gopkg.in/ot24net/goget.v1
 	# go get package
 	goget -insecure -d -v -u
 }
