@@ -167,7 +167,7 @@ installApp() {
 	resetCfgName
 	
 	# build supervisor conf
-	sudo mkdir $sup_etc_dir
+	sudo mkdir -p $sup_etc_dir
 	if [ -f $sup_etc_dir/$cfg_name.conf ]; then
 		echo '#' "'$cfg_name' already exist"
 		return 1
