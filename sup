@@ -116,25 +116,25 @@ supStatus(){
 
 goBuild(){
 	# get special goget for golang.org/x
-	go get -insecure -v github.com/ot24net/goget
+	go get -insecure -v github.com/ot24net/goget || exit 1
 	# go get package
-	goget -insecure -d -v
+	goget -insecure -d -v || exit 1
 	# go  build
 	go build -i || exit 1
 }
 
 goGet(){
 	# get special goget for golang.org/x
-	go get -insecure -v github.com/ot24net/goget
+	go get -insecure -v github.com/ot24net/goget || exit 1
 	# go get package
-	goget -insecure -d -v
+	goget -insecure -d -v || exit 1
 }
 
 goUpdate(){
 	# get special goget for golang.org/x
-	go get -insecure -u -v github.com/ot24net/goget
+	go get -insecure -u -v github.com/ot24net/goget || exit 1
 	# go get package
-	goget -insecure -d -v -u
+	goget -insecure -d -v -u || exit 1
 }
 
 # 编译程序
