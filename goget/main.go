@@ -9,7 +9,7 @@ package main
 import (
 	"os"
 
-	"go/get"
+	"gotools/get"
 )
 
 func main() {
