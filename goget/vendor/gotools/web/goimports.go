@@ -122,8 +122,9 @@ func goget(importPath string) (urlStr string, body io.ReadCloser) {
 				log.Printf("Fetching %s", urlStr)
 			}
 
+			pkgName := strings.Join(paths[:3], "/")
 			gitUrl := "https://github.com/golang/" + paths[2] + ".git"
-			body = &IOReadCloser{Reader: strings.NewReader(fmt.Sprintf(`<html><head><meta content='%s git %s' name='go-import'></head></html>`, importPath, gitUrl))}
+			body = &IOReadCloser{Reader: strings.NewReader(fmt.Sprintf(`<html><head><meta content='%s git %s' name='go-import'></head></html>`, pkgName, gitUrl))}
 
 			return urlStr, body
 		}

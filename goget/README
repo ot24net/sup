@@ -1,47 +1,8 @@
 
 修改自go1.9的go get源码
+需要转义时配置,PJ_ROOT环境变量指向，与配置.goget文件到根目录或者是当前目录, 优先查找当前目录：
+执行:
+go get -u gopkg.in/sup/goget
+goget . #与go get命令一致
 
-cp -rf $GOROOT/src/internal .
-cp -rf $GOROOT/src/cmd/internal .
-cp -rf $GOROOT/src/cmd/go .
-
-
-整合并编译，依次修改错误
-
-在解析x包时强制增加以下跳转检查
-
-type IOReadCloser struct {
-	*strings.Reader
-}
-
-func (io *IOReadCloser) Close() error {
-	// ignore
-	return nil
-}
-
-func checkGolangX(importPath string) (urlStr string, body io.ReadCloser) {
-	// 强制将golang.org/x包转到github/golang
-	if strings.Contains(importPath, "golang.org/x/") {
-		// 解析包
-		paths := strings.Split(importPath, "/")
-		if len(paths) > 2 {
-			u, err := url.Parse("https://" + importPath)
-			if err != nil {
-				return
-			}
-			u.RawQuery = "go-get=1"
-			urlStr = u.String()
-			if cfg.BuildV {
-				log.Printf("Fetching %s", urlStr)
-			}
-
-			pkgName := strings.Join(paths[:3], "/")
-			gitUrl := "https://github.com/golang/" + paths[2] + ".git"
-			body = &IOReadCloser{Reader: strings.NewReader(fmt.Sprintf(`<html><head><meta content='%s git %s' name='go-import'></head></html>`, pkgName, gitUrl))}
-
-			return urlStr, body
-		}
-	}
-	return
-}
 
