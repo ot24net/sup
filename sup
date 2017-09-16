@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # 检查依赖
-if [ -z $PJ_NAME ]; then
+if [ -z "$PJ_NAME" ]; then
     echo "\$PJ_NAME NOT FOUND"
     exit 1
 fi
-if [ -z $PJ_ROOT ]; then
+if [ -z "$PJ_ROOT" ]; then
     echo "\$PJ_ROOT NOT FOUND"
     exit 1
 fi
@@ -16,41 +16,41 @@ if [ ${#1} -gt 0 ]; then
 	pwd_dir=$1
 fi
 
-app_name=`basename $pwd_dir`
+app_name="`basename $pwd_dir`"
 app_path="${pwd_dir#\/*src\/}"
 
 cfg_name="$PJ_NAME.${app_path//\//.}"
 
-pub_root=$PJ_ROOT/publish
-pub_dir=$pub_root/$PJ_NAME
+pub_root="$PJ_ROOT/publish"
+pub_dir="$pub_root/$PJ_NAME"
 
 sup_mode="src"
 sup_etc_dir="/etc/supervisor/conf.d"
-if [ !$SUP_ETC_DIR ] ; then
-	sup_etc_dir=$SUP_ETC_DIR
+if [ !"$SUP_ETC_DIR" ] ; then
+	sup_etc_dir="$SUP_ETC_DIR"
 fi
 if [ "${sup_etc_dir: -1}" = "/" ]; then
-	sup_etc_dir=${sup_etc_dir%?}
+	sup_etc_dir="${sup_etc_dir%?}"
 fi
 sup_log_size="1MB"
-if [ !$SUP_LOG_SIZE ] ; then
-        sup_log_size=$SUP_LOG_SIZE
+if [ !"$SUP_LOG_SIZE" ] ; then
+        sup_log_size="$SUP_LOG_SIZE"
 fi
 sup_log_bak="10"
-if [ !$SUP_LOG_BAK ] ; then
-        sup_log_bak=$SUP_LOG_BAK
+if [ !"$SUP_LOG_BAK" ] ; then
+        sup_log_bak="$SUP_LOG_BAK"
 fi
 sup_app_env="PJ_ROOT=\\\"$PJ_ROOT\\\",GIN_MODE=\\\"release\\\",LD_LIBRARY_PATH=\\\"$LD_LIBRARY_PATH\\\""
-if [ !$SUP_APP_ENV ] ; then
-        sup_app_env=$SUP_APP_ENV
+if [ !"$SUP_APP_ENV" ] ; then
+        sup_app_env="$SUP_APP_ENV"
 fi
 
 resetCfgName(){
-	pwd_dir=`pwd`
+	pwd_dir="`pwd`"
 	if [ ${#1} -gt 0 ]; then
-		pwd_dir=$1
+		pwd_dir="$1"
 	fi
-	app_name=`basename $pwd_dir`
+	app_name="`basename $pwd_dir`"
 	app_path="${pwd_dir#\/*src\/}"
 	cfg_name="$PJ_NAME.${app_path//\//.}"
 }
@@ -115,20 +115,31 @@ supStatus(){
 }
 
 goBuild(){
-	# go get package
-	goget -insecure -d -v || exit 1
 	# go  build
-	go build -i || exit 1
+	if [ $# -gt 1 ]; then
+		go build -i ${*#*build} || exit 1
+	else
+		go build -i || exit 1
+	fi
 }
 
 goGet(){
 	# go get package
-	goget -insecure -d -v || exit 1
+	if [ $# -gt 1 ]; then
+		goget -insecure -d -v ${*#*get} || exit 1
+	else
+		goget -insecure -d -v || exit 1
+	fi
 }
 
 goUpdate(){
 	# go get package
-	goget -insecure -d -v -u || exit 1
+	# go get package
+	if [ $# -gt 1 ]; then
+		goget -insecure -d -v -u ${*#*update} || exit 1
+	else
+		goget -insecure -d -v -u || exit 1
+	fi
 }
 
 # 编译程序
@@ -136,7 +147,7 @@ goUpdate(){
 buildApp() {
 	resetCfgName
 	echo '#' "Building $cfg_name"
-	goBuild
+	goBuild $*
 }
 
 # 下载最新依赖编译程序
@@ -144,7 +155,7 @@ buildApp() {
 getApp(){
 	resetCfgName
 	echo '#' "Doing go get $cfg_name"
-	goGet
+	goGet $*
 }
 
 # 下载最新依赖编译程序
@@ -152,7 +163,7 @@ getApp(){
 updateApp(){
 	resetCfgName
 	echo '#' "Updateing $cfg_name"
-	goUpdate
+	goUpdate $*
 }
 
 # 编译程序
@@ -162,12 +173,12 @@ installApp() {
 	
 	# build supervisor conf
 	sudo mkdir -p $sup_etc_dir
-	if [ -f $sup_etc_dir/$cfg_name.conf ]; then
-		echo '#' "'$cfg_name' already exist"
+	if [ -f "$sup_etc_dir/$cfg_name.conf" ]; then
+		echo '#' "'$cfg_name' already exist, need clean at first"
 		return 1
 	fi
 	
-	if [ ! -f $pwd_dir/$app_name ]; then
+	if [ ! -f "$pwd_dir/$app_name" ]; then
 		echo '#' "Not found '$cfg_name' binary command, need build at first"
 		return 1
 	fi
@@ -206,7 +217,7 @@ cleanApp(){
         resetCfgName
 
 	echo '#' "Cleaning $cfg_name"
-        if [ -f $sup_etc_dir/$cfg_name.conf ]; then
+        if [ -f "$sup_etc_dir/$cfg_name.conf" ]; then
                 callSup stop $cfg_name||exit 1
                 callSup remove $cfg_name||exit 1
                 sudo rm $sup_etc_dir/$cfg_name.conf||exit 1
@@ -231,7 +242,7 @@ publishApp(){
 	mkdir -p $pub_dir/src/$app_path||exit 1
 	
 	# build
-	goBuild|| exit 1
+	goBuild $* || exit 1
 	# collecting for main app
 	mv $app_name $pub_dir/src/$app_path||exit 1
 	# collecting for web static file
@@ -253,6 +264,16 @@ redoCmd(){
 			rm -rf $pub_dir||exit 1
 		fi
 	fi
+	case "$2" in 
+		"all"):
+			buildp=$SUP_BUILD_PATH
+			# Spec for publish
+			if [ "$1" = "publish" ]; then
+				rm -rf $pub_dir||exit 1
+			fi
+		;;
+	esac
+
 	
 	for a in $buildp
 	do
@@ -308,7 +329,7 @@ case "$1" in
 	;;
 	"build"|"get"|"update"|"publish")
 		if [ "$sup_mode" == "pub" ]; then
-			echo "Can not use in published mode"
+			echo '#' "Can not use the command in published mode"
 			exit 0
 		fi
 		redoCmd $*
@@ -316,19 +337,24 @@ case "$1" in
 	;;
 
 	""|"help")
-        	echo "此脚本集成go与supervisord来管理当前项目发布的程序，以下常用管理指令"
-        	echo "========================================================================================"
-        	echo "sup build -- 下载当前目录下的依赖并编译程序"
-        	echo "sup build all -- 依次下载env.bash的\$SUP_BUILD_PATH路径下的依赖并编译程序"
-        	echo "sup get -- 下载当前目录下的依赖"
+		# TODO:英文化
+        	echo "此脚本集成go与supervisord来管理当前项目发布的程序，以下常用管理指令，以下指令之外的请使用源程序"
+		echo ""
+		echo "以下是编辑使用的指令："
+        	echo "sup get -- 下载当前目录下的依赖, 支持go get参数扩展"
         	echo "sup get all -- 依次下载env.bash的\$SUP_BUILD_PATH路径下的依赖"
+        	echo "sup update -- 使用最新的库编译应用(go get -u), 并支持go get参数扩展"
+        	echo "sup update all -- 使用最新的库编译env.bash的\$SUP_BUILD_PATH路径下的程序"
+        	echo "sup build -- 编译程序, 支持go参数扩展"
+        	echo "sup build all -- 依次编译env.bash的\$SUP_BUILD_PATH路径下的程序"
+		echo ""
+		echo "以下是部署模式下使用的指令："
+		echo "sup status 查看当前工程的部署运作情况"
         	echo "sup install -- 安装当前目录程序的supervisor配置文件"
         	echo "sup install all -- 安装env.bash的\$SUP_BUILD_PATH路径下程序的supervisor配置文件"
-        	echo "sup update -- 使用最新的库编译应用(go get -u +go build)"
-        	echo "sup update all -- 使用最新的库编译env.bash的\$SUP_BUILD_PATH路径下的程序"
         	echo "sup clean -- 清理当前目录的发布环境"
         	echo "sup clean all -- 依次清理env.bash的\$SUP_BUILD_PATH路径下的发布环境"
-        	echo "sup publish -- 发布为非源码部署"
+        	echo "sup publish -- 发布为非源码部署, 支持go build参数扩展"
         	echo "sup publish all -- 依次发布env.bash的\$SUP_BUILD_PATH路径下的部署"
         	echo "sup start -- 启动当前目录的程序(supervisorctrl start \$cfg_name)"
         	echo "sup start all -- 依次启动env.bash的\$SUP_BUILD_PATH路径下的程序"
@@ -347,7 +373,7 @@ case "$1" in
 		exit 0
 	;;
 	*)
-		callSup $*
+		echo '#' "Unsupport command '$*', you can use offical command to do it."
 		exit 0
 	;;
 esac

@@ -1,20 +1,23 @@
 
 go项目发布管理工具
 
-依赖：
-需要配合以下项目管理脚本使用
+项目使用例子：
 https://github.com/ot24net/goapp
 
-集成了:
-go的编译指令;
-supervisord守护管理常用指令;
+系统集成::
+集成了go build编译指令;
+重写了go get指令为goget，支持本地重定向库的能力;
+集成了supervisorctl守护管理常用指令, 使用supervisor部署程序;
 
 使用环境：
-因依赖于supervisor,发布环境当前仅在debian上做了验证
+因依赖于supervisor,发布前请安装supevisor并设置好相关环境变更，默认为debian下的环境
 
 库版版本管理
 使用gopkg.in的版本管理方式
-例如：go get gopkg.in/yaml.v1
+使用goget指令进行管理，该指令比go get增加了本地重定向库的能力，详情.goget
+例如：sup get gopkg.in/yaml.v1
 
-TODO:
-将supervisor的环境变量移至项目变量脚本中
+关于vendor的使用
+TODO:考虑下一步集成vendor的能力, 当前请使用第三方工具，如https://github.com/golang/dep
+
+
