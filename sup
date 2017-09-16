@@ -184,13 +184,11 @@ installApp() {
 	fi
 	
 	echo '#' "Installing $cfg_name"
+	# 设定supervisor的环境变量
 	sudo bash -c "echo "[program:$cfg_name]" > $sup_etc_dir/$cfg_name.conf"
 	sudo bash -c "echo "user=$USER" >> $sup_etc_dir/$cfg_name.conf"
-	sudo bash -c "echo "command=$pwd_dir/$app_name" >> $sup_etc_dir/$cfg_name.conf"
-	# 设定环境变量
-	pwd_dir=`pwd`
-	# 从环境变量中读取配置
-	sudo bash -c "echo "environment=$sup_app_env" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "environment="$sup_app_env"" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "command="$pwd_dir/$app_name ${*#*install}"" >> $sup_etc_dir/$cfg_name.conf"
 	sudo bash -c "echo "autostart=true" >> $sup_etc_dir/$cfg_name.conf"
 	sudo bash -c "echo "autorestart=true" >> $sup_etc_dir/$cfg_name.conf"
 	sudo bash -c "echo "directory=$pwd_dir" >> $sup_etc_dir/$cfg_name.conf"
@@ -350,8 +348,8 @@ case "$1" in
 		echo ""
 		echo "以下是部署模式下使用的指令："
 		echo "sup status 查看当前工程的部署运作情况"
-        	echo "sup install -- 安装当前目录程序的supervisor配置文件"
-        	echo "sup install all -- 安装env.bash的\$SUP_BUILD_PATH路径下程序的supervisor配置文件"
+        	echo "sup install [app_args]-- 安装当前目录程序的supervisor配置文件, 若运行时需要参数，请填写"
+        	echo "sup install all -- 安装env.bash的\$SUP_BUILD_PATH路径下程序的supervisor配置文件，该指令暂未支持运行参数传递"
         	echo "sup clean -- 清理当前目录的发布环境"
         	echo "sup clean all -- 依次清理env.bash的\$SUP_BUILD_PATH路径下的发布环境"
         	echo "sup publish -- 发布为非源码部署, 支持go build参数扩展"
