@@ -42,7 +42,8 @@ func init() {
 	cfg, err := config.ReadDefault("./.goget")
 	if err != nil {
 		errStr := err.Error()
-		if !strings.Contains(errStr, "no such file or directory") {
+		// for linux and windows
+		if !strings.Contains(errStr, "no such file or directory") || !strings.Contains("The system cannot find the file specified"){
 			log.Printf("%s,%s\n", "./.goget", err.Error())
 			return
 		}
@@ -53,7 +54,7 @@ func init() {
 		cfg, err = config.ReadDefault(root + "/.goget")
 		if err != nil {
 			errStr := err.Error()
-			if !strings.Contains(errStr, "no such file or directory") {
+			if !strings.Contains(errStr, "no such file or directory") || !strings.Contains("The system cannot find the file specified"){
 				log.Printf("%s, %s\n", root+"/.goget", err.Error())
 			}
 			return
