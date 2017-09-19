@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# sup version
+sup_ver = "v3"
+
 # 检查依赖
 if [ -z "$PJ_NAME" ]; then
     echo "\$PJ_NAME NOT FOUND"
@@ -368,6 +371,10 @@ case "$1" in
 	;;
 	"status")
 		supStatus
+		exit 0
+	;;
+	"version")
+		echo  "sup versoin:" $sup_ver
 		exit 0
 	;;
 	*)
