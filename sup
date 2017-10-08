@@ -157,7 +157,7 @@ buildApp() {
 # 需进入当前目录才能编译
 getApp(){
 	resetCfgName
-	echo '#' "Doing go get $cfg_name"
+	echo '#' "Doing go get ${*#*get}"
 	goGet $*
 }
 
@@ -165,7 +165,7 @@ getApp(){
 # 需进入当前目录才能编译
 updateApp(){
 	resetCfgName
-	echo '#' "Updateing $cfg_name"
+	echo '#' "Doing go get -u ${*#*update}"
 	goUpdate $*
 }
 
