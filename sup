@@ -67,7 +67,7 @@ callSup(){
 startApp(){
 	resetCfgName
 	if [ $# -gt 1 ]; then
-		callSup start ${*#*start}
+		callSup start ${*#*' start '}
 	else
 		callSup start $cfg_name
 	fi
@@ -76,7 +76,7 @@ startApp(){
 restartApp(){
 	resetCfgName
 	if [ $# -gt 1 ]; then
-   		callSup restart ${*#*restart}
+   		callSup restart ${*#*' restart ' }
 	else
         	callSup restart $cfg_name
  	fi
@@ -85,7 +85,7 @@ restartApp(){
 stopApp(){
 	resetCfgName
 	if [ $# -gt 1 ]; then
-   		callSup stop ${*#*stop}
+   		callSup stop ${*#*' stop '}
 	else
 	        callSup stop $cfg_name
 	fi
@@ -94,7 +94,7 @@ stopApp(){
 tailApp(){
 	resetCfgName
 	if [ $# -gt 1 ]; then
-    		callSup tail ${*#*tail}
+    		callSup tail ${*#*' tail '}
 	else
    		callSup tail $cfg_name
 	fi
@@ -102,7 +102,7 @@ tailApp(){
 tailfApp(){
 	resetCfgName
 	if [ $# -gt 1 ]; then
-   		callSup tail -f ${*#*tailf}
+   		callSup tail -f ${*#*' tailf '}
 	else
     		callSup tail -f $cfg_name
 	fi
@@ -120,7 +120,7 @@ supStatus(){
 goBuild(){
 	# go  build
 	if [ $# -gt 1 ]; then
-		go build -i ${*#*build} || exit 1
+		go build -i ${*#*' build '} || exit 1
 	else
 		go build -i || exit 1
 	fi
@@ -129,17 +129,16 @@ goBuild(){
 goGet(){
 	# go get package
 	if [ $# -gt 1 ]; then
-		goget -insecure -d -v ${*#*get} || exit 1
+		goget -insecure -d -v ${*#*' get '} || exit 1
 	else
 		goget -insecure -d -v || exit 1
 	fi
 }
 
 goUpdate(){
-	# go get package
-	# go get package
+	# go get -u package
 	if [ $# -gt 1 ]; then
-		goget -insecure -d -v -u ${*#*update} || exit 1
+		goget -insecure -d -v -u ${*#*' update '} || exit 1
 	else
 		goget -insecure -d -v -u || exit 1
 	fi
@@ -157,7 +156,7 @@ buildApp() {
 # 需进入当前目录才能编译
 getApp(){
 	resetCfgName
-	echo '#' "Doing go get ${*#*get}"
+	echo '#' "Doing go get ${*#*' get '}"
 	goGet $*
 }
 
@@ -165,7 +164,7 @@ getApp(){
 # 需进入当前目录才能编译
 updateApp(){
 	resetCfgName
-	echo '#' "Doing go get -u ${*#*update}"
+	echo '#' "Doing go get -u ${*#*' update '}"
 	goUpdate $*
 }
 
@@ -191,7 +190,7 @@ installApp() {
 	sudo bash -c "echo "[program:$cfg_name]" > $sup_etc_dir/$cfg_name.conf"
 	sudo bash -c "echo "user=$USER" >> $sup_etc_dir/$cfg_name.conf"
 	sudo bash -c "echo "environment="$sup_app_env"" >> $sup_etc_dir/$cfg_name.conf"
-	sudo bash -c "echo "command="$pwd_dir/$app_name ${*#*install}"" >> $sup_etc_dir/$cfg_name.conf"
+	sudo bash -c "echo "command="$pwd_dir/$app_name ${*#*' install '}"" >> $sup_etc_dir/$cfg_name.conf"
 	sudo bash -c "echo "autostart=true" >> $sup_etc_dir/$cfg_name.conf"
 	sudo bash -c "echo "autorestart=true" >> $sup_etc_dir/$cfg_name.conf"
 	sudo bash -c "echo "directory=$pwd_dir" >> $sup_etc_dir/$cfg_name.conf"
@@ -282,37 +281,37 @@ redoCmd(){
 	       		cd $a
 	       		case "$1" in
 	                	"start")
-	                	        startApp ${*#*all}
+	                	        startApp ${*#*' all '}
 	                	        ;;
 	                	"stop")
-	                	        stopApp ${*#*all}
+	                	        stopApp ${*#*' all '}
 	                	        ;;
 	                	"restart")
-	                	        restartApp ${*#*all}
+	                	        restartApp ${*#*' all '}
 	                	        ;;
 	                	"tail")
-	                	        tailApp ${*#*all}
+	                	        tailApp ${*#*' all '}
 	                	        ;;
 	                	"tailf")
-	                	        tailfApp ${*#*all}
+	                	        tailfApp ${*#*' all '}
 	                	        ;;
 	                	"build")
-	                	        buildApp ${*#*all}
+	                	        buildApp ${*#*' all '}
 	                	        ;;
 	                	"get")
-	                	        getApp ${*#*all}
+	                	        getApp ${*#*' all '}
 	                	        ;;
 	                	"install")
-	                	        installApp ${*#*all}
+	                	        installApp ${*#*' all '}
 	                	        ;;
 	                	"update")
-	                	        updateApp ${*#*all}
+	                	        updateApp ${*#*' all '}
 	                	        ;;
 	                	"clean")
-	                	        cleanApp ${*#*all}
+	                	        cleanApp ${*#*' all '}
 	                	        ;;
 	                	"publish")
-	                	        publishApp ${*#*all}
+	                	        publishApp ${*#*' all '}
 	                	        ;;
 	        	esac
 		fi
