@@ -10,7 +10,7 @@ https://github.com/ot24net/goapp
 集成了supervisorctl守护管理常用指令, 使用supervisor部署程序;
 
 使用环境：
-因依赖于supervisor,发布前请安装supevisor并设置好相关环境变更，默认为debian下的环境
+因依赖于supervisor,发布前请安装supevisor并设置好相关环境变量，默认为debian下的环境
 
 库版版本管理
 使用gopkg.in的版本管理方式
