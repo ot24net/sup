@@ -26,6 +26,14 @@ cfg_name="$PJ_NAME.${app_path//\//.}"
 
 pub_root="$PJ_ROOT/publish"
 pub_dir="$pub_root/$PJ_NAME"
+pub_root_res="res etc"
+pub_app_res="public"
+if [ !"$PUB_ROOT_RES" ] ; then
+	pub_root_res="$PUB_ROOT_RES"
+fi
+if [ !"$PUB_APP_RES" ] ; then
+	pub_root_res="$PUB_APP_RES"
+fi
 
 sup_mode="src"
 sup_etc_dir="/etc/supervisor/conf.d"
@@ -230,32 +238,40 @@ publishApp(){
 	echo '#' "Publishing $cfg_name to $pub_dir"
 	
 	mkdir -p $pub_dir/bin
-	mkdir -p $pub_dir/res
-	mkdir -p $pub_dir/etc
 	cp -rf $PJ_ROOT/env.bash $pub_dir/||exit 1
 	cp -rf $(dirname $0)/sup $pub_dir/bin/||exit 1
 	sed -i "s/sup_mode=\"src\"/sup_mode=\"pub\"/g" $pub_dir/bin/sup||exit 1
-	cp -rf $PJ_ROOT/res $pub_dir/
-	cp -rf $PJ_ROOT/etc $pub_dir/
+
+	# collecting root directory
+	for d in $pub_root_res
+	do
+		if [ -d $PJ_ROOT/$d ]; then
+			mkdir -p $pub_dir/$d||exit 1
+			cp -rf $PJ_ROOT/$d $pub_dir/||exit 1
+		fi
+	done
+
 	
+	# build app
+	goBuild $* || exit 1
 	rm -rf $pub_dir/src/$app_path||exit 1
 	mkdir -p $pub_dir/src/$app_path||exit 1
-	
-	# build
-	goBuild $* || exit 1
+
 	# collecting for main app
 	mv $app_name $pub_dir/src/$app_path||exit 1
-	# collecting for web static file
-	if [ -d "$pwd_dir/public" ]; then
-		cp -rf $pwd_dir/public $pub_dir/src/$app_path||exit 1
-	fi
+	for d in $pub_app_res
+	do
+		if [ -d $pwd_dir/$d ]; then
+			cp -rf $pwd_dir/$d $pub_dir/src/$app_path||exit 1
+		fi
+	done
 }
 
 redoCmd(){
 	# 备份当前目录
 	currdir=`pwd`
 	buildp=$currdir
-    args="$2 $3 $4 $5 $6 $7 $8"
+	args="$2 $3 $4 $5 $6 $7 $8"
 	
 	# 校验是否是全部编译
 	if [ "$2" = "all" ] ; then
@@ -264,8 +280,8 @@ redoCmd(){
 		if [ "$1" = "publish" ]; then
 			rm -rf $pub_dir||exit 1
 		fi
-        # rebuild args
-        args="$3 $4 $5 $6 $7 $8"
+        	# rebuild args
+        	args="$3 $4 $5 $6 $7 $8"
 	fi
 	
 	for a in $buildp
