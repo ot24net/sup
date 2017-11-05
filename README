@@ -12,7 +12,7 @@ https://github.com/ot24net/goapp
 使用环境：
 因依赖于supervisor,发布前请安装supevisor并设置好相关环境变量，默认为debian下的环境
 
-库版版本管理
+库版本管理
 使用gopkg.in的版本管理方式
 使用goget指令进行管理，该指令比go get增加了本地重定向库的能力，详情.goget
 例如：sup get gopkg.in/yaml.v1
