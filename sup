@@ -349,7 +349,7 @@ case "$1" in
 		# TODO:英文化
        echo "此脚本集成go与supervisord来管理当前项目发布的程序，以下常用管理指令，以下指令之外的请使用源程序"
        echo ""
-       echo "以下是编辑使用的指令："
+       echo "以下是编译使用的指令："
        echo "sup get -- 下载当前目录下的依赖, 支持go get参数扩展"
        echo "sup get all -- 依次下载env.bash的\$SUP_BUILD_PATH路径下的依赖"
        echo "sup update -- 使用最新的库编译应用(go get -u), 并支持go get参数扩展"
@@ -357,7 +357,7 @@ case "$1" in
        echo "sup build -- 编译程序, 支持go参数扩展"
        echo "sup build all -- 依次编译env.bash的\$SUP_BUILD_PATH路径下的程序"
        echo ""
-       echo "以下是部署模式下使用的指令："
+       echo "以下是部署使用的指令："
        echo "sup status 查看当前工程的部署运作情况"
        echo "sup install [app_args]-- 安装当前目录程序的supervisor配置文件, 若运行时需要参数，请填写"
        echo "sup install all -- 安装env.bash的\$SUP_BUILD_PATH路径下程序的supervisor配置文件，该指令暂未支持运行参数传递"
