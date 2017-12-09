@@ -156,7 +156,7 @@ goUpdate(){
 # 需进入当前目录才能编译
 buildApp() {
 	resetCfgName
-	echo '#' "Building $cfg_name"
+	echo '#' "Building ($cfg_name)"
 	goBuild $*
 }
 
@@ -164,7 +164,7 @@ buildApp() {
 # 需进入当前目录才能编译
 getApp(){
 	resetCfgName
-	echo '#' "Doing go get $1 $2 $3 $4 $5 $6 $7 $8"
+	echo '#' "Doing go get ($cfg_name) $1 $2 $3 $4 $5 $6 $7 $8"
 	goGet $*
 }
 
@@ -172,7 +172,7 @@ getApp(){
 # 需进入当前目录才能编译
 updateApp(){
 	resetCfgName
-	echo '#' "Doing go get -u $1 $2 $3 $4 $5 $6 $7 $8"
+	echo '#' "Doing go get ($cfg_name) -u $1 $2 $3 $4 $5 $6 $7 $8"
 	goUpdate $*
 }
 
@@ -193,7 +193,7 @@ installApp() {
 		return 1
 	fi
 	
-	echo '#' "Installing $cfg_name"
+	echo '#' "Installing ($cfg_name)"
 	# 设定supervisor的环境变量
 	sudo bash -c "echo "[program:$cfg_name]" > $sup_etc_dir/$cfg_name.conf"
 	sudo bash -c "echo "user=$USER" >> $sup_etc_dir/$cfg_name.conf"
@@ -224,7 +224,7 @@ installApp() {
 cleanApp(){
         resetCfgName
 
-	echo '#' "Cleaning $cfg_name"
+	echo '#' "Cleaning ($cfg_name)"
         if [ -f "$sup_etc_dir/$cfg_name.conf" ]; then
                 callSup stop $cfg_name||exit 1
                 callSup remove $cfg_name||exit 1
